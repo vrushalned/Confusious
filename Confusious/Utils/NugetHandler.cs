@@ -159,6 +159,10 @@ namespace Confusious.Utils
                 TargetPath = "lib/net8.0/fakefeed.dll"
             });
 
+            if (!Directory.Exists(outputDir))
+            {
+                Directory.CreateDirectory(outputDir);
+            }
             string nupkgPath = Path.Combine(outputDir, $"{packageId}.{version}.nupkg");
 
             using var fs = File.Create(nupkgPath);
