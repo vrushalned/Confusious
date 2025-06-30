@@ -62,6 +62,28 @@ dotnet build
 dotnet run --path <path-to-project.assets.json>
 ```
 
+## Sample Output
+Reading /path/to/your/project/obj/project.assets.json ...
+Config Path: /path/to/your/project/NuGet.config
+
+Public packages:
+PackageName: Newtonsoft.Json, Version: 13.0.1
+
+Internal packages:
+PackageName: Internal.Logging, Version: 1.0.0, Source: https://internal.nuget/feed
+
+Adding fake feed...
+Creating fake packages...
+Running dotnet restore...
+
+!!!VULNERABLE PACKAGES!!!
+PackageName: Internal.Logging, Version: 1.0.0, Source: file:///fakefeed/
+
+Cleaning up...
+Restoring original packages...
+
+
+
 ## Ethical Usage Advisory
 
 Confusious is intended **solely for authorized security testing** on projects and environments you own or have explicit permission to analyze.  
