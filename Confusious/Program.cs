@@ -20,7 +20,9 @@ if (!string.IsNullOrEmpty(projectFilePath))
 {
     Console.WriteLine($"Reading {projectFilePath} ....");
     var dependencies = ProjectFileParser.ParseProjectFile(projectFilePath);
-    var sources = ProjectFileParser.GetSourcesFromProjectFile(projectFilePath);
+    (var sources, var configPath) = ProjectFileParser.GetSourcesFromProjectFile(projectFilePath);
+
+    Console.WriteLine($"Config Path: {configPath}");
 
     var segregation = await NugetHandler.GetSegregatedDependenciesAsync(dependencies, sources);
 
@@ -45,6 +47,9 @@ if (!string.IsNullOrEmpty(projectFilePath))
                 Console.WriteLine($"PackageName: {package.Name}, Version: {package.Version}");
             }
         }
+
+        NugetHandler.AddNugetFakeFeed(configPath);
+        NugetHandler.RemoveNugetFakeFeed(configPath) ;
     }
 
 }
