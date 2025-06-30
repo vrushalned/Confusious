@@ -1,5 +1,6 @@
 ﻿using Confusious.Models;
 using NuGet.Common;
+using NuGet.Packaging;
 using NuGet.Packaging.Core;
 using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
@@ -136,6 +137,32 @@ namespace Confusious.Utils
 
 
 
+        }
+
+        public static void CreateDummyPackage(string packageId, string version, string outputDir)
+        {
+            Console.WriteLine($"Creating fake package for {packageId} {version}");
+            string projectRoot = AppContext.BaseDirectory;
+            string dummyDllPath = Path.Combine(projectRoot, "FakeFeedFiles", "fakefeed.dll");
+
+            var builder = new PackageBuilder
+            {
+                Id = packageId,
+                Version = NuGetVersion.Parse(version),
+                Description = "Dummy package for dependency confusion PoC",
+                Authors = { "PoC" }
+            };
+
+            builder.Files.Add(new PhysicalPackageFile
+            {
+                SourcePath = dummyDllPath,
+                TargetPath = "lib/net8.0/fakefeed.dll"
+            });
+
+            string nupkgPath = Path.Combine(outputDir, $"{packageId}.{version}.nupkg");
+
+            using var fs = File.Create(nupkgPath);
+            builder.Save(fs);
         }
     }
 }

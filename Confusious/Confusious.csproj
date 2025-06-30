@@ -14,4 +14,8 @@
     <PackageReference Include="System.Formats.Asn1" Version="9.0.6" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="FakeFeedFiles\" />
+  </ItemGroup>
+
 </Project>

@@ -1,7 +1,9 @@
 ﻿
 using Confusious;
+using Confusious.Constants;
 using Confusious.Utils;
 using System.CommandLine;
+using System.Reflection.Metadata;
 
 var projectFileOption = new Option<string>("--path")
 {
@@ -49,6 +51,10 @@ if (!string.IsNullOrEmpty(projectFilePath))
         }
 
         NugetHandler.AddNugetFakeFeed(configPath);
+        foreach(var package in internalPackages)
+        {
+            NugetHandler.CreateDummyPackage(package.Name, package.Version, Constants.FakeFeedPath);
+        }
         NugetHandler.RemoveNugetFakeFeed(configPath) ;
     }
 
