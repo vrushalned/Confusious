@@ -30,7 +30,7 @@ namespace Confusious
 
         }
 
-        public static List<string> GetSourcesFromProjectFile(string projectFilePath)
+        public static (List<string>, string) GetSourcesFromProjectFile(string projectFilePath)
         {
             var json = File.ReadAllText(projectFilePath);
             var sources = new List<string>();
@@ -38,6 +38,7 @@ namespace Confusious
             var parsedJson = JsonDocument.Parse(json);
 
             var root = parsedJson.RootElement;
+            string configPath = "";
 
             if (root.TryGetProperty("project", out var projectProp) &&
                 projectProp.TryGetProperty("restore", out var restoreProp) &&
@@ -48,6 +49,17 @@ namespace Confusious
                 foreach(var source in sourcesProp.EnumerateObject())
                 {
                     sources.Add(source.Name);
+                }
+            }
+            if (root.TryGetProperty("project", out var project) &&
+                projectProp.TryGetProperty("restore", out var restore) &&
+                restore.TryGetProperty("configFilePaths", out var configPaths) &&
+                configPaths.ValueKind == JsonValueKind.Array)
+            {
+                foreach (var source in configPaths.EnumerateArray())
+                {
+                    if(source.ToString().Contains(Constants.Constants.NugetConfigFile))
+                        configPath = source.ToString();
                 }
             }
             sources.Remove(Constants.Constants.Feed);
@@ -66,7 +78,7 @@ namespace Confusious
                 Console.WriteLine(source);
 
             }
-            return sources;
+            return (sources, configPath);
         }
     }
 }

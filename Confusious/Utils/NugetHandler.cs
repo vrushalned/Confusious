@@ -1,10 +1,11 @@
 ﻿using Confusious.Models;
 using NuGet.Common;
+using NuGet.Packaging;
 using NuGet.Packaging.Core;
 using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
 using NuGet.Versioning;
-using System;
+using System.Xml.Linq;
 
 namespace Confusious.Utils
 {
@@ -31,6 +32,12 @@ namespace Confusious.Utils
                                 dependency.IsInternal = false;
                             else
                                 dependency.IsInternal = true;
+                            if(source.Contains(Constants.Constants.FakeFeedPath))
+                                dependency.IsVulnerable = true;
+                            else
+                                dependency.IsVulnerable = false;
+                            dependency.Source = source;
+
                             dependenciesList.Add(dependency);
                         }
                     }
@@ -42,6 +49,129 @@ namespace Confusious.Utils
             }
 
             return dependenciesList;
+        }
+
+        public static void AddNugetFakeFeed(string configPath)
+        {
+            Console.WriteLine($"Adding fake feed in {configPath} ...");
+            
+            XDocument doc;
+            if (File.Exists(configPath))
+            {
+                doc = XDocument.Load(configPath);
+            }
+            else
+            {
+                doc = new XDocument(new XElement("configuration"));
+            }
+
+            XElement config = doc.Element("configuration");
+            XElement packageSources = config.Element("packageSources");
+
+            if (packageSources == null)
+            {
+                packageSources = new XElement("packageSources");
+                config.Add(packageSources);
+            }
+
+            var toRemove = packageSources.Elements("add")
+                .Where(x => (string)x.Attribute("key") == Constants.Constants.FakeFeedName)
+                .ToList();
+
+            foreach (var x in toRemove)
+                x.Remove();
+
+            var existing = packageSources.Elements("add")
+                .Where(x => (string)x.Attribute("key") == Constants.Constants.FakeFeedName)
+                .ToList();
+
+            foreach (var x in existing)
+                x.Remove();
+
+            var newSourceElement = new XElement("add",
+                new XAttribute("key", Constants.Constants.FakeFeedName),
+                new XAttribute("value", Constants.Constants.FakeFeedPath));
+
+            var nugetOrg = packageSources.Elements("add")
+                .FirstOrDefault(x => (string)x.Attribute("key") == "nuget.org");
+
+            if (nugetOrg != null)
+            {
+                nugetOrg.AddBeforeSelf(newSourceElement);
+            }
+            else
+            {
+                packageSources.AddFirst(newSourceElement);
+            }
+
+            doc.Save(configPath);
+
+
+        }
+
+        public static void RemoveNugetFakeFeed(string configPath)
+        {
+            Console.WriteLine($"Removing fake feed from {configPath} ...");
+
+            XDocument doc;
+            if (File.Exists(configPath))
+            {
+                doc = XDocument.Load(configPath);
+            }
+            else
+            {
+                doc = new XDocument(new XElement("configuration"));
+            }
+
+            XElement config = doc.Element("configuration");
+            XElement packageSources = config.Element("packageSources");
+
+            if (packageSources == null)
+            {
+                packageSources = new XElement("packageSources");
+                config.Add(packageSources);
+            }
+
+            var toRemove = packageSources.Elements("add")
+                .Where(x => (string)x.Attribute("key") == Constants.Constants.FakeFeedName)
+                .ToList();
+
+            foreach (var x in toRemove)
+                x.Remove();
+
+            doc.Save(configPath);
+
+
+
+        }
+
+        public static void CreateDummyPackage(string packageId, string version, string outputDir)
+        {
+            Console.WriteLine($"Creating fake package for {packageId} {version}");
+            string dummyDllPath = Path.Combine(Directory.GetCurrentDirectory(),"FakeFeedFiles", "fakfeed.dll");
+
+            var builder = new PackageBuilder
+            {
+                Id = packageId,
+                Version = NuGetVersion.Parse(version),
+                Description = "Dummy package for dependency confusion PoC",
+                Authors = { "PoC" }
+            };
+
+            builder.Files.Add(new PhysicalPackageFile
+            {
+                SourcePath = dummyDllPath,
+                TargetPath = "lib/net8.0/fakefeed.dll"
+            });
+
+            if (!Directory.Exists(outputDir))
+            {
+                Directory.CreateDirectory(outputDir);
+            }
+            string nupkgPath = Path.Combine(outputDir, $"{packageId}.{version}.nupkg");
+
+            using var fs = File.Create(nupkgPath);
+            builder.Save(fs);
         }
     }
 }
