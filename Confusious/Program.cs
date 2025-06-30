@@ -3,7 +3,6 @@ using Confusious;
 using Confusious.Constants;
 using Confusious.Utils;
 using System.CommandLine;
-using System.Reflection.Metadata;
 
 var projectFileOption = new Option<string>("--path")
 {
@@ -46,7 +45,7 @@ if (!string.IsNullOrEmpty(projectFilePath))
             Console.WriteLine("Internal packages: ");
             foreach (var package in internalPackages)
             {
-                Console.WriteLine($"PackageName: {package.Name}, Version: {package.Version}");
+                Console.WriteLine($"PackageName: {package.Name}, Version: {package.Version}, Source: {package.Source}");
             }
         }
 
@@ -70,7 +69,7 @@ if (!string.IsNullOrEmpty(projectFilePath))
                 Console.WriteLine("!!!Vulnerable Packages!!!");
                 foreach (var package in vulnerablePackages) 
                 {
-                    Console.WriteLine($"PackageName: {package.Name}, Version: {package.Version}");
+                    Console.WriteLine($"PackageName: {package.Name}, Version: {package.Version}, Source: {package.Source}");
                 }
 
             }
@@ -78,6 +77,21 @@ if (!string.IsNullOrEmpty(projectFilePath))
         }
        
         NugetHandler.RemoveNugetFakeFeed(configPath) ;
+        CommandLineProcesses.RunDotnetRestore(projectFilePath.Replace("\\obj\\project.assets.json", ""));
+        sources.Remove(fakeSource) ;
+        dependencies.ForEach(x => x.Found = false);
+        var packageReCheck = await NugetHandler.GetSegregatedDependenciesAsync(dependencies, sources);
+        var recheckedPackages = packageReCheck.Where(x => x.IsVulnerable == true);
+
+        if (recheckedPackages != null && recheckedPackages.Any())
+        {
+            Console.WriteLine("!!!Vulnerable Packages!!!");
+            foreach (var package in recheckedPackages)
+            {
+                Console.WriteLine($"PackageName: {package.Name}, Version: {package.Version}, Source: {package.Source}");
+            }
+
+        }
     }
 
 }
