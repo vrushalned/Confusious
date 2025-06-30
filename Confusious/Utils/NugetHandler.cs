@@ -32,6 +32,11 @@ namespace Confusious.Utils
                                 dependency.IsInternal = false;
                             else
                                 dependency.IsInternal = true;
+                            if(source.Contains(Constants.Constants.FakeFeedPath))
+                                dependency.IsVulnerable = true;
+                            else
+                                dependency.IsVulnerable = false;
+
                             dependenciesList.Add(dependency);
                         }
                     }

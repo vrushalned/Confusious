@@ -55,6 +55,28 @@ if (!string.IsNullOrEmpty(projectFilePath))
         {
             NugetHandler.CreateDummyPackage(package.Name, package.Version, Constants.FakeFeedPath);
         }
+        CommandLineProcesses.RunDotnetRestore(projectFilePath.Replace("\\obj\\project.assets.json", ""));
+        var fakeSource = sources.Where(x => x.Contains(Constants.FakeFeedPath)).FirstOrDefault();
+        if (!string.IsNullOrEmpty(fakeSource)) 
+        {
+            sources.Remove(fakeSource);
+            sources.Insert(0, fakeSource);
+            dependencies.ForEach(x => x.Found = false);
+            var packageCheck = await NugetHandler.GetSegregatedDependenciesAsync(dependencies, sources);
+            var vulnerablePackages = packageCheck.Where(x => x.IsVulnerable == true);
+
+            if(vulnerablePackages  != null && vulnerablePackages.Any())
+            {
+                Console.WriteLine("!!!Vulnerable Packages!!!");
+                foreach (var package in vulnerablePackages) 
+                {
+                    Console.WriteLine($"PackageName: {package.Name}, Version: {package.Version}");
+                }
+
+            }
+
+        }
+       
         NugetHandler.RemoveNugetFakeFeed(configPath) ;
     }
 
