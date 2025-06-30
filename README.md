@@ -63,6 +63,7 @@ dotnet run --path <path-to-project.assets.json>
 ```
 
 ## Sample Output
+```bash
 Reading /path/to/your/project/obj/project.assets.json ...
 Config Path: /path/to/your/project/NuGet.config
 
@@ -81,6 +82,7 @@ PackageName: Internal.Logging, Version: 1.0.0, Source: file:///fakefeed/
 
 Cleaning up...
 Restoring original packages...
+```
 
 
 
