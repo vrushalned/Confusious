@@ -81,7 +81,7 @@ if (!string.IsNullOrEmpty(projectFilePath))
         sources.Remove(fakeSource) ;
         dependencies.ForEach(x => x.Found = false);
         var packageReCheck = await NugetHandler.GetSegregatedDependenciesAsync(dependencies, sources);
-        var recheckedPackages = packageReCheck.Where(x => x.IsVulnerable == true);
+        var recheckedPackages = packageReCheck;
 
         if (recheckedPackages != null && recheckedPackages.Any())
         {

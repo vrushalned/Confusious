@@ -36,6 +36,7 @@ namespace Confusious.Utils
                                 dependency.IsVulnerable = true;
                             else
                                 dependency.IsVulnerable = false;
+                            dependency.Source = source;
 
                             dependenciesList.Add(dependency);
                         }
