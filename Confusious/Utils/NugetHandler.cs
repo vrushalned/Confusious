@@ -142,8 +142,7 @@ namespace Confusious.Utils
         public static void CreateDummyPackage(string packageId, string version, string outputDir)
         {
             Console.WriteLine($"Creating fake package for {packageId} {version}");
-            string projectRoot = AppContext.BaseDirectory;
-            string dummyDllPath = Path.Combine(projectRoot, "FakeFeedFiles", "fakefeed.dll");
+            string dummyDllPath = Path.Combine(Directory.GetCurrentDirectory(), "fakefeed.dll");
 
             var builder = new PackageBuilder
             {
