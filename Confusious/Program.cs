@@ -56,7 +56,7 @@ if (!string.IsNullOrEmpty(projectFilePath))
             NugetHandler.CreateDummyPackage(package.Name, package.Version, Constants.FakeFeedPath);
         }
         CommandLineProcesses.RunDotnetRestore(projectFilePath.Replace("\\obj\\project.assets.json", ""));
-        var fakeSource = sources.Where(x => x.Contains(Constants.FakeFeedPath)).FirstOrDefault();
+        var fakeSource = Constants.FakeFeedPath;
         if (!string.IsNullOrEmpty(fakeSource)) 
         {
             sources.Remove(fakeSource);
