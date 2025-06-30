@@ -62,3 +62,13 @@ dotnet build
 dotnet run --path <path-to-project.assets.json>
 ```
 
+## Ethical Usage Advisory
+
+Confusious is intended **solely for authorized security testing** on projects and environments you own or have explicit permission to analyze.  
+Unauthorized use against third-party systems, services, or software is strictly prohibited and may violate applicable laws and regulations.
+
+By using Confusious, you agree to act responsibly and ethically. The authors disclaim any liability for misuse or damages arising from improper use.
+
+Always obtain proper consent before testing any software or infrastructure.
+
+
