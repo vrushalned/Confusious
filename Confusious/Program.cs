@@ -77,6 +77,7 @@ if (!string.IsNullOrEmpty(projectFilePath))
         }
        
         NugetHandler.RemoveNugetFakeFeed(configPath) ;
+        CommandLineProcesses.CleanupFromAssetsPath(projectFilePath, Constants.FakeFeedPath);
         CommandLineProcesses.RunDotnetRestore(projectFilePath.Replace("\\obj\\project.assets.json", ""));
         sources.Remove(fakeSource) ;
         dependencies.ForEach(x => x.Found = false);

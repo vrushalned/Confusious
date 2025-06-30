@@ -28,5 +28,39 @@ namespace Confusious.Utils
 
             return process.ExitCode == 0;
         }
+
+        public static void CleanupFromAssetsPath(string assetsJsonPath, string fakeFeedDir)
+    {
+        string objDir = Path.GetDirectoryName(assetsJsonPath);
+        if (objDir == null) throw new InvalidOperationException("Invalid assets.json path");
+
+        string projectDir = Directory.GetParent(objDir)?.FullName;
+        if (projectDir == null) throw new InvalidOperationException("Unable to resolve project directory");
+
+        string binDir = Path.Combine(projectDir, "bin");
+
+        string[] foldersToDelete = { binDir, objDir, fakeFeedDir };
+
+        foreach (var folder in foldersToDelete)
+        {
+            if (Directory.Exists(folder))
+            {
+                try
+                {
+                    Directory.Delete(folder, recursive: true);
+                    Console.WriteLine($"Deleted: {folder}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Failed to delete {folder}: {ex.Message}");
+                }
+            }
+            else
+            {
+                Console.WriteLine($"Not found (skipped): {folder}");
+            }
+        }
     }
+
+}
 }
